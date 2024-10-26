@@ -125,6 +125,20 @@
       "repo": "rules_ts",
       "file_regex": "^rules_ts-"
     },
+    {
+      "name": "rules_shell",
+      "type": "github_release",
+      "owner": "bazelbuild",
+      "repo": "rules_shell",
+      "file_regex": "^rules_shell-"
+    },
+    {
+      "name": "rules_cc",
+      "type": "github_release",
+      "owner": "bazelbuild",
+      "repo": "rules_cc",
+      "file_regex": "^rules_cc-"
+    },
     //buildifier
     {
       "name": "buildifier-linux-amd64",
