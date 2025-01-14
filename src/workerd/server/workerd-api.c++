@@ -670,7 +670,7 @@ static v8::Local<v8::Value> createBindingValue(JsgWorkerdIsolate::Lock& lock,
         // JSON.parse(process.env.FOO) works because the value is a parseable
         // JSON string. JSON.parse(process.env.BAR) throws an error because
         // the value is not a parseable JSON string, even tho the binding uses
-        // type JSON. JSON.parse(process.env.BAZ)` works because the original
+        // type JSON. JSON.parse(process.env.BAZ) works because the original
         // JSON-encoded value was double-escaped and the result of the above
         // v8::JSON::Parse is itself a parseable JSON string.
         //
