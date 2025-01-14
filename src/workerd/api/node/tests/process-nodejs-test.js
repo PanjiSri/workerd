@@ -46,10 +46,10 @@ export const processEnv = {
     // vis versa
     assert.strictEqual(env.QUX, undefined);
     env.ZZZ = 'a';
-    assert.strictEqual(pEnv.ZZZ, undefined);
+    assert.strictEqual(process.env.ZZZ, undefined);
 
     env.FOO = ['just some other value'];
-    assert.strictEqual(pEnv.FOO, 'BAR');
+    assert.strictEqual(process.env.FOO, 'BAR');
 
     // Other kinds of bindings will be on env but not process.env
     assert.strictEqual(pEnv.NON, undefined);
