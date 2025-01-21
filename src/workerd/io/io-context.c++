@@ -250,7 +250,10 @@ IoContext::IncomingRequest::~IoContext_IncomingRequest() noexcept(false) {
     return;
   }
 
+  KJ_LOG(WARNING, "incoming request shutdown");
   if (&context->incomingRequests.front() == this) {
+    context->getMetrics().reportOutcome(*context);
+
     // We're the current request, make sure to consume CPU time attribution.
     context->limitEnforcer->reportMetrics(*metrics);
 
@@ -425,6 +428,7 @@ void IoContext::addWaitUntil(kj::Promise<void> promise) {
 // Mark ourselves so we know that we made a best effort attempt to wait for waitUntilTasks.
 kj::Promise<void> IoContext::IncomingRequest::drain() {
   waitedForWaitUntil = true;
+  //context->getMetrics().reportOutcome(*context);
 
   if (&context->incomingRequests.front() != this) {
     // A newer request was received, so draining isn't our job.
@@ -487,6 +491,8 @@ class IoContext::PendingEvent: public kj::Refcounted {
 };
 
 IoContext::~IoContext() noexcept(false) {
+  KJ_LOG(WARNING, "context shutdown");
+
   // Detach the PendingEvent if it still exists.
   KJ_IF_SOME(pe, pendingEvent) {
     pe.maybeContext = kj::none;

@@ -74,6 +74,7 @@ class TailStreamWriter final {
     Reporter reporter;
     uint32_t sequence = 0;
     bool onsetSeen = false;
+    bool outcomeSeen = false;
     State(Reporter reporter): reporter(kj::mv(reporter)) {}
   };
   kj::Maybe<State> state;

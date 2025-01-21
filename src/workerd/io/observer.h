@@ -142,6 +142,8 @@ class RequestObserver: public kj::Refcounted {
   virtual void reportTailEvent(
       IoContext& ioContext, kj::FunctionParam<tracing::TailEvent::Event()> fn) {}
 
+  virtual void reportOutcome(IoContext& ioContext) {}
+
   virtual kj::Own<void> addedContextTask() {
     return kj::Own<void>();
   }

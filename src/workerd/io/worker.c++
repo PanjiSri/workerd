@@ -1021,7 +1021,9 @@ Worker::Isolate::Isolate(kj::Own<Api> apiParam,
                                          const jsg::JsValue& error, const jsg::JsMessage& message) {
         // Only add exception to trace when running within an I/O context with a tracer.
         if (IoContext::hasCurrent()) {
+          KJ_LOG(WARNING, "traced - in callback");
           auto& ioContext = IoContext::current();
+          //ioContext.getMetrics().reportOutcome(ioContext);
           KJ_IF_SOME(tracer, ioContext.getWorkerTracer()) {
             addExceptionToTrace(js, ioContext, tracer, UncaughtExceptionSource::REQUEST_HANDLER,
                 error, api->getErrorInterfaceTypeHandler(js));

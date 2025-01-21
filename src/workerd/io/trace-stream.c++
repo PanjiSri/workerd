@@ -937,20 +937,33 @@ tracing::TailStreamWriter::TailStreamWriter(Reporter reporter): state(State(kj::
 
 void tracing::TailStreamWriter::report(IoContext& ioContext, TailEvent::Event&& event) {
   auto& s = KJ_UNWRAP_OR_RETURN(state);
-  bool ending = event.tryGet<tracing::Outcome>() != kj::none ||
-      event.tryGet<tracing::Hibernate>() != kj::none;
+  //if (s.outcomeSeen/* && event.tryGet<tracing::Outcome>() != kj::none*/) {
+  //  return;
+  //}
+  bool ending = /*event.tryGet<tracing::Outcome>() != kj::none ||
+      event.tryGet<tracing::Hibernate>() != kj::none*/
+      0;
+  if (event.tryGet<tracing::Outcome>() != kj::none) {
+    KJ_LOG(WARNING, "got outcome");
+  }
   KJ_DEFER({
     if (ending) state = kj::none;
+    //if (ending) state->inner = TailStreamWriterState::Closed{};
   });
   if (event.tryGet<tracing::Onset>() != kj::none) {
     KJ_ASSERT(!s.onsetSeen, "Tail stream onset already provided");
     s.onsetSeen = true;
   }
+  if (event.tryGet<tracing::Outcome>() != kj::none) {
+    //KJ_ASSERT(!s.outcomeSeen, "Tail stream outcome already provided");
+    s.outcomeSeen = true;
+  }
   tracing::TailEvent tailEvent(
       ioContext.getInvocationSpanContext(), ioContext.now(), s.sequence++, kj::mv(event));
 
   // If the reporter returns false, then we will treat it as a close signal.
-  ending = !s.reporter(ioContext, kj::mv(tailEvent));
+  //ending = !s.reporter(ioContext, kj::mv(tailEvent));
+  s.reporter(ioContext, kj::mv(tailEvent));
 }
 
 }  // namespace workerd::tracing

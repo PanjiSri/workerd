@@ -1627,7 +1627,8 @@ kj::Maybe<kj::Own<tracing::TailStreamWriter>> initializeTailStreamWriter(
       KJ_CASE_ONEOF(active, kj::Array<kj::Own<TailStreamWriterState::Active>>) {
         // Event cannot be a onset, which should have been validated by the writer.
         KJ_ASSERT(!event.event.is<tracing::Onset>(), "Only the first event can be an onset");
-        auto final = event.event.is<tracing::Outcome>() || event.event.is<tracing::Hibernate>();
+        //auto final = event.event.is<tracing::Outcome>() || event.event.is<tracing::Hibernate>();
+        auto final = false;
         KJ_DEFER({
           if (final) state->inner = TailStreamWriterState::Closed{};
         });
@@ -1648,6 +1649,7 @@ class RequestObserverWithTracer final: public RequestObserver, public WorkerInte
             initializeTailStreamWriter(kj::mv(streamingTailWorkers), waitUntilTasks)) {}
 
   ~RequestObserverWithTracer() noexcept(false) {
+    KJ_LOG(WARNING, "observer shutdown");
     KJ_IF_SOME(t, tracer) {
       if (fetchStatus != 0) {
         t->setFetchResponseInfo(tracing::FetchResponseInfo(fetchStatus));
@@ -1673,6 +1675,14 @@ class RequestObserverWithTracer final: public RequestObserver, public WorkerInte
       IoContext& ioContext, kj::FunctionParam<tracing::TailEvent::Event()> fn) override {
     KJ_IF_SOME(writer, maybeTailStreamWriter) {
       writer->report(ioContext, fn());
+    }
+  }
+
+  void reportOutcome(IoContext& ioContext) override {
+    KJ_LOG(WARNING, "reporting event", maybeTailStreamWriter != kj::none);
+    KJ_IF_SOME(writer, maybeTailStreamWriter) {
+      writer->report(
+          ioContext, tracing::Outcome(outcome, 0 * kj::MILLISECONDS, 0 * kj::MILLISECONDS));
     }
   }
 
