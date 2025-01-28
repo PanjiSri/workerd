@@ -1540,7 +1540,7 @@ struct TailStreamWriterState {
     if (!current.onsetSeen) {
       // Our first event... yay! Our first job here will be to dispatch
       // the onset event to the tail worker. If the tail worker wishes
-      // to handle the remaining events in the strema, then it will return
+      // to handle the remaining events in the stream, then it will return
       // a new capability to which those would be reported. This is done
       // via the "result.getPipeline()" API below. If hasPipeline()
       // returns false then that means the tail worker did not return
@@ -1594,7 +1594,7 @@ kj::Maybe<kj::Own<tracing::TailStreamWriter>> initializeTailStreamWriter(
   }
   return kj::heap<tracing::TailStreamWriter>(
       // This lambda is called for every streaming tail event that is reported. We use
-      // the TailStreamWriterState for this strema to actually handle the event.
+      // the TailStreamWriterState for this stream to actually handle the event.
       [state = kj::heap<TailStreamWriterState>(kj::mv(streamingTailWorkers), waitUntilTasks)](
           IoContext& ioContext, tracing::TailEvent&& event) mutable {
     KJ_SWITCH_ONEOF(state->inner) {

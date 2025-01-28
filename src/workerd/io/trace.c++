@@ -1636,6 +1636,7 @@ void SpanBuilder::addLog(kj::Date timestamp, kj::ConstString key, TagValue value
 }
 
 PipelineTracer::~PipelineTracer() noexcept(false) {
+  KJ_LOG(WARNING, "pipeline tracer dealloc");
   KJ_IF_SOME(f, completeFulfiller) {
     f.get()->fulfill(traces.releaseAsArray());
   }

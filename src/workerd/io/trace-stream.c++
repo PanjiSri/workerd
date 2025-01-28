@@ -907,6 +907,7 @@ kj::Promise<WorkerInterface::CustomEvent::Result> TailStreamCustomEventImpl::sen
     }
   });
 
+  KJ_LOG(WARNING, "tailStreamSession request");
   auto req = dispatcher.tailStreamSessionRequest();
   auto sent = req.send();
 
