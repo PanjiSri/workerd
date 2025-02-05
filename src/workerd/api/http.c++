@@ -1112,7 +1112,8 @@ jsg::Ref<Request> Request::constructor(
 
   // TODO(conform): If `init` has a keepalive flag, pass it to the Body constructor.
   return jsg::alloc<Request>(method, url, redirect, KJ_ASSERT_NONNULL(kj::mv(headers)),
-      kj::mv(fetcher), kj::mv(signal), kj::mv(cf), kj::mv(body), cacheMode);
+      kj::mv(fetcher), kj::mv(signal), kj::mv(cf), kj::mv(body), /* thisSignal */ kj::none,
+      cacheMode);
 }
 
 jsg::Ref<Request> Request::clone(jsg::Lock& js) {
@@ -1122,7 +1123,7 @@ jsg::Ref<Request> Request::clone(jsg::Lock& js) {
   auto bodyClone = Body::clone(js);
 
   return jsg::alloc<Request>(method, url, redirect, kj::mv(headersClone), getFetcher(), getSignal(),
-      kj::mv(cfClone), kj::mv(bodyClone));
+      kj::mv(cfClone), kj::mv(bodyClone), /* thisSignal */ kj::none);
 }
 
 kj::StringPtr Request::getMethod() {
