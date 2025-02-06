@@ -370,7 +370,7 @@ build:windows --cxxopt='/Zc:__cplusplus' --host_cxxopt='/Zc:__cplusplus'
 build:clang-coverage --copt="-fprofile-instr-generate" --linkopt="-fprofile-instr-generate"
 build:clang-coverage --copt="-fcoverage-mapping" --linkopt="-fcoverage-mapping"
 
-build --enable_workspace
+common --enable_workspace
 # As part of starlarkification, Bazel 8 removes a number of rules which now need to be imported from
 # other repositories. In the long term, load() statements will be needed to import these rules. For
 # now, we can still autoload the affected repositories when needed. Do this only for a few
@@ -378,3 +378,6 @@ build --enable_workspace
 # autoload set – some dependencies aren't importing the required shell rules yet, but we don't want
 # to accidentally rely on autoloading more dependencies.
 build --incompatible_autoload_externally="+py_binary,+py_library,+py_test,+ProtoInfo,+sh_binary,+proto_library,+cc_proto_library"
+
+# TODO: Workaround for Bazel 8 Windows https://github.com/bazelbuild/bazel/issues/25198
+build:windows --legacy_external_runfiles

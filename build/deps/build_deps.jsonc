@@ -126,18 +126,25 @@
       "file_regex": "^rules_ts-"
     },
     {
-      "name": "rules_shell",
-      "type": "github_release",
-      "owner": "bazelbuild",
-      "repo": "rules_shell",
-      "file_regex": "^rules_shell-"
-    },
-    {
       "name": "rules_cc",
       "type": "github_release",
       "owner": "bazelbuild",
       "repo": "rules_cc",
       "file_regex": "^rules_cc-"
+    },
+    {
+      "name": "rules_java",
+      "type": "github_release",
+      "owner": "bazelbuild",
+      "repo": "rules_java",
+      "file_regex": "^rules_java-"
+    },
+    {
+      "name": "rules_shell",
+      "type": "github_release",
+      "owner": "bazelbuild",
+      "repo": "rules_shell",
+      "file_regex": "^rules_shell-"
     },
     //buildifier
     {

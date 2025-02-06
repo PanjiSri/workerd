@@ -2,10 +2,10 @@
 
 load("@//:build/http.bzl", "http_archive")
 
-TAG_NAME = "0.0.17"
-URL = "https://github.com/bazelbuild/rules_cc/releases/download/0.0.17/rules_cc-0.0.17.tar.gz"
-STRIP_PREFIX = "rules_cc-0.0.17"
-SHA256 = "abc605dd850f813bb37004b77db20106a19311a96b2da1c92b789da529d28fe1"
+TAG_NAME = "0.1.1"
+URL = "https://github.com/bazelbuild/rules_cc/releases/download/0.1.1/rules_cc-0.1.1.tar.gz"
+STRIP_PREFIX = "rules_cc-0.1.1"
+SHA256 = "712d77868b3152dd618c4d64faaddefcc5965f90f5de6e6dd1d5ddcd0be82d42"
 TYPE = "tgz"
 
 def dep_rules_cc():
