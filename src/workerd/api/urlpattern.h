@@ -4,8 +4,12 @@
 
 #pragma once
 
+#include "ada.h"
+
 #include <workerd/jsg/jsg.h>
-#include <workerd/jsg/url.h>
+
+#include <optional>
+#include <string_view>
 
 namespace workerd::api {
 
@@ -19,6 +23,22 @@ namespace workerd::api {
   V(Search, search)                                                                                \
   V(Hash, hash)
 
+class URLPatternRegexEngine {
+ public:
+  URLPatternRegexEngine() = default;
+  using regex_type = jsg::JsRef<jsg::JsRegExp>;
+  static std::optional<regex_type> create_instance(std::string_view pattern, bool ignore_case) {
+    return std::nullopt;
+  }
+  static std::optional<std::vector<std::optional<std::string>>> regex_search(
+      std::string_view input, const regex_type& pattern) {
+    return std::nullopt;
+  }
+  static bool regex_match(std::string_view input, const regex_type& pattern) {
+    return false;
+  }
+};
+
 // URLPattern is a Web Platform standard API for matching URLs against a
 // pattern syntax (think of it as a regular expression for URLs). It is
 // defined in https://wicg.github.io/urlpattern.
@@ -26,6 +46,8 @@ namespace workerd::api {
 // https://developer.mozilla.org/en-US/docs/Web/API/URL_Pattern_API
 class URLPattern final: public jsg::Object {
  public:
+  explicit URLPattern(ada::url_pattern<URLPatternRegexEngine>&& i): inner(kj::mv(i)) {};
+
   // A structure providing matching patterns for individual components
   // of a URL. When a URLPattern is created, or when a URLPattern is
   // used to match or test against a URL, the input can be given as
@@ -40,7 +62,8 @@ class URLPattern final: public jsg::Object {
 
     JSG_STRUCT(protocol, username, password, hostname, port, pathname, search, hash, baseURL);
 
-    operator jsg::UrlPattern::Init();
+    static URLPatternInit create(const ada::url_pattern_init& other);
+    ada::url_pattern_init toAdaType();
   };
 
   using URLPatternInput = kj::OneOf<kj::String, URLPatternInit>;
@@ -52,9 +75,12 @@ class URLPattern final: public jsg::Object {
   // specification.
   struct URLPatternComponentResult final {
     kj::String input;
-    jsg::Dict<kj::String, kj::String> groups;
+    jsg::JsObject groups;
 
     JSG_STRUCT(input, groups);
+
+    static URLPatternComponentResult create(
+        jsg::Lock& js, const ada::url_pattern_component_result& other);
   };
 
   // A struct providing the URLPattern matching results for all
@@ -67,23 +93,21 @@ class URLPattern final: public jsg::Object {
 #undef V
 
     JSG_STRUCT(inputs, protocol, username, password, hostname, port, pathname, search, hash);
+
+    static URLPatternResult create(jsg::Lock& js, const ada::url_pattern_result& other);
   };
 
   struct URLPatternOptions final {
     jsg::Optional<bool> ignoreCase;
 
     JSG_STRUCT(ignoreCase);
-  };
 
-  explicit URLPattern(jsg::UrlPattern inner
-#define V(_, name) , jsg::JsRef<jsg::JsRegExp> name##Regex
-          URL_PATTERN_COMPONENTS(V)
-#undef V
-  );
+    ada::url_pattern_options toAdaType() const;
+  };
 
   static jsg::Ref<URLPattern> constructor(jsg::Lock& js,
       jsg::Optional<URLPatternInput> input,
-      jsg::Optional<kj::String> baseURL,
+      jsg::Optional<kj::OneOf<kj::String, URLPatternOptions>> baseURL,
       jsg::Optional<URLPatternOptions> patternOptions);
 
   kj::Maybe<URLPatternResult> exec(
@@ -91,7 +115,7 @@ class URLPattern final: public jsg::Object {
 
   bool test(jsg::Lock& js, jsg::Optional<URLPatternInput> input, jsg::Optional<kj::String> baseURL);
 
-#define V(name, _) kj::StringPtr get##name();
+#define V(name, _) kj::StringPtr get##name() const;
   URL_PATTERN_COMPONENTS(V)
 #undef V
 
@@ -103,17 +127,8 @@ class URLPattern final: public jsg::Object {
     JSG_METHOD(exec);
   }
 
-  void visitForMemoryInfo(jsg::MemoryTracker& tracker) const {
-    tracker.trackField("inner", inner);
-  }
-
  private:
-  jsg::UrlPattern inner;
-#define V(_, name) jsg::JsRef<jsg::JsRegExp> name##Regex;
-  URL_PATTERN_COMPONENTS(V)
-#undef V
-
-  void visitForGc(jsg::GcVisitor& visitor);
+  ada::url_pattern<URLPatternRegexEngine> inner;
 };
 
 #define EW_URLPATTERN_ISOLATE_TYPES                                                                \
