@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <title>Book Catalog - Front2 (Read-Only)</title>
+    <style>
+      body {
+        font-family: sans-serif;
+        margin: 2rem;
+      }
+      button {
+        margin: 0.5rem 0;
+      }
+      #book-list {
+        margin-top: 1rem;
+      }
+      .book-row {
+        margin-bottom: 0.5rem;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Front2 Book Catalog (Read-Only)</h1>
+
+    <button id="refresh-btn">Refresh</button>
+
+    <div id="book-list"></div>
+
+    <script>
+      const bookList   = document.getElementById("book-list");
+      const refreshBtn = document.getElementById("refresh-btn");
+
+      loadBooks();
+
+      refreshBtn.addEventListener("click", loadBooks);
+
+      async function loadBooks() {
+        bookList.innerHTML = "Loading...";
+        const res = await fetch("/api/books");
+        if (!res.ok) {
+          bookList.innerHTML = "Error fetching books.";
+          return;
+        }
+        const books = await res.json();
+        renderBooks(books);
+      }
+
+      function renderBooks(books) {
+        const entries = Object.values(books);
+        if (entries.length === 0) {
+          bookList.innerHTML = "<p>No books found.</p>";
+          return;
+        }
+
+        bookList.innerHTML = "";
+        entries.forEach(book => {
+          const row = document.createElement("div");
+          row.className = "book-row";
+          row.textContent = `"${book.title}" by ${book.author}`;
+          bookList.appendChild(row);
+        });
+      }
+    </script>
+  </body>
+</html>
