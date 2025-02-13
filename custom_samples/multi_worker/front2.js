@@ -26,7 +26,7 @@ export default {
 
       return stub.fetch(doReq);
     }
-    
+
     return new Response("front2-service 404 not found", { status:404 });
   }
 };
