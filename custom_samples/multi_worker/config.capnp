@@ -39,7 +39,11 @@ const dataWorker :Workerd.Worker = (
   ],
 
   durableObjectNamespaces = [
-    ( className = "BookDO", uniqueKey = "unique-bookdo-key" )
+    (
+      className = "BookDO",
+      uniqueKey = "unique-bookdo-key",
+      preventEviction = true
+    ),
   ],
 
   durableObjectStorage = (inMemory = void),
@@ -51,7 +55,7 @@ const front1Worker :Workerd.Worker = (
 
   modules = [
     ( name = "front1.js",   esModule = embed "front1.js" ),
-    ( name = "front1.html", text    = embed "front1.html" )
+    ( name = "front1.html", text    = embed "newfront1.html" )
   ],
 
   globalOutbound = "internet",

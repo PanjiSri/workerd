@@ -3,63 +3,73 @@
   <head>
     <meta charset="utf-8" />
     <title>Book Catalog - Front2 (Read-Only)</title>
-    <style>
-      body {
-        font-family: sans-serif;
-        margin: 2rem;
-      }
-      button {
-        margin: 0.5rem 0;
-      }
-      #book-list {
-        margin-top: 1rem;
-      }
-      .book-row {
-        margin-bottom: 0.5rem;
-      }
-    </style>
+    <link
+      rel="stylesheet"
+      type="text/css"
+      href="https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.min.css"
+    />
   </head>
-  <body>
-    <h1>Front2 Book Catalog (Read-Only)</h1>
+  <body style="font-family: verdana; margin: auto; width: 700px; padding-top: 20px;">
+    <h2>📚 Book Catalog (Read-Only)</h2>
+    <br />
+    <div id="book-grid-view" style="min-height: 350px;"></div>
 
-    <button id="refresh-btn">Refresh</button>
+    <script type="module">
+      import { w2grid } from "https://rawgit.com/vitmalina/w2ui/master/dist/w2ui.es6.min.js";
 
-    <div id="book-list"></div>
+      const apiEndpoint = "/api";
 
-    <script>
-      const bookList   = document.getElementById("book-list");
-      const refreshBtn = document.getElementById("refresh-btn");
+      const grid = new w2grid({
+        name: "grid",
+        box: "#book-grid-view",
+        multiSelect: false,
+        show: {
+          toolbar: true,
+        },
+        toolbar: {
+          items: [
+            { id: "refresh", type: "button", text: "Refresh", icon: "w2ui-icon-reload" },
+          ],
+          onClick(event) {
+            if (event.target === "refresh") {
+              loadData();
+            }
+          },
+        },
+        columns: [
+          { field: "recid", text: "ID", size: "50px", sortable: true },
+          { field: "title", text: "Title", size: "35%", sortable: true },
+          { field: "author", text: "Author", size: "35%", sortable: true },
+        ],
+        records: [],
+      });
 
-      loadBooks();
+      function loadData() {
+        fetch(apiEndpoint + "/books")
+          .then((response) => {
+            if (!response.ok) {
+              window.alert("Failed to fetch book data: status " + response.status);
+              return [];
+            }
+            return response.json();
+          })
+          .then((json) => {
+            grid.clear();
 
-      refreshBtn.addEventListener("click", loadBooks);
-
-      async function loadBooks() {
-        bookList.innerHTML = "Loading...";
-        const res = await fetch("/api/books");
-        if (!res.ok) {
-          bookList.innerHTML = "Error fetching books.";
-          return;
-        }
-        const books = await res.json();
-        renderBooks(books);
+            for (const book of json) {
+              grid.add({
+                recid: book.id,
+                title: book.title,
+                author: book.author,
+              });
+            }
+          })
+          .catch((err) => {
+            window.alert("Failed to fetch book data: " + err.message);
+          });
       }
 
-      function renderBooks(books) {
-        const entries = Object.values(books);
-        if (entries.length === 0) {
-          bookList.innerHTML = "<p>No books found.</p>";
-          return;
-        }
-
-        bookList.innerHTML = "";
-        entries.forEach(book => {
-          const row = document.createElement("div");
-          row.className = "book-row";
-          row.textContent = `"${book.title}" by ${book.author}`;
-          bookList.appendChild(row);
-        });
-      }
+      loadData();
     </script>
   </body>
 </html>
